@@ -1,0 +1,13 @@
+#!/bin/bash
+# This script changes to 'latest' the tag of docker images from fabric hyperledger whose tag != 'latest'
+
+echo "$(docker images | grep 'fabric' | grep -v 'latest')" |
+while read p; do
+        CONTAINER=$(echo $p | gawk 'match($0, /fabric-(\w+)/, a) {print a[1]}')
+        VERSION=$(echo $p | gawk '{print $2}')
+        docker tag hyperledger/fabric-'$CONTAINER':'$VERSION' hyperledger/fabric-'$CONTAINER':latest'
+done
+
+# The first line prints all docker images whose tag is not the latest. Because of the quotes, the printout contains a line per docker image. We feed the echo output to the while loop. A typical line will look as
+# hyperledger/fabric-tools                x86_64-1.1.0        b7bfddf508bc        5 months ago        1.46GB
+# Using gawk, we store in CONTAINER the word after hyperledger/fabric-. and its tag in VERSION. With these ingredients, we can write the docker command that changes the tag.
