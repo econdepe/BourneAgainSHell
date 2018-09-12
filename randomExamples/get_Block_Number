@@ -1,0 +1,13 @@
+#!/bin/bash
+# This script extracts the current block number in base 10 in the Ropsten Ethereum network, using an RPC call to an INFURA node.
+
+json=$(curl -s -X POST -H "Content-Type: application/json" --data '{"jsonrpc": "2.0", "id": 1, "method": "eth_blockNumber", "params": []}' "https://ropsten.infura.io/v3/31d279db248f4ce1a055deb24b380e21")
+hexa=$(echo $json | gawk 'match($0, /result":"0x(\w+)"/, a) {print a[1]}')
+dec=$(echo "ibase=16; ${hexa^^}" | bc)
+echo "Current block Number in hexadecimal: $hexa"
+echo "Current block Number in decimal: $dec"
+
+# The first line makes an RPC call to an INFURA server with my API key. This returns a JSON of the form
+# {"jsonrpc":"2.0","id":1,"result":"0x3d72f8"}
+# The block number (in hexadecimal) is what comes after the 0x in the entry "result". I extract this with gawk.
+# Finally the hexadecimal number is changed to base 10, and both numbers are printed
